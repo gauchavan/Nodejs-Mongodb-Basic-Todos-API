@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { ObjectId } = require('mongodb');
+const _ = require('lodash');
 
 var { mongoose } = require('./db/mongoose');
 var { Todo } = require('./models/todo');
@@ -71,6 +72,39 @@ app.delete('/todo/:id', (req, res) => {
         res.status(404).send(e);
     })
 })
+
+app.patch('/todo/:id', (req, res) => {
+    var id = req.params.id;
+    var data = _.pick(req.body, ['task', 'isCompleted']);
+    
+    if(!ObjectId.isValid(id)){
+        return res.status(404).send();
+    }
+
+    if(_.isBoolean(data.isCompleted) && data.isCompleted){
+        data.completedAt = new Date().getTime();
+    }else{
+        data.isCompleted = false;
+        data.completedAt = null;
+    }
+
+    Todo.findByIdAndUpdate(id, {
+        $set : data
+    },{
+        new: true
+    }).then((todo) => {
+        if(!todo){
+            return res.status(404).send();
+        }
+
+        res.send({
+            todo
+        })
+    }).catch((e) => {
+        return res.status(404).send();
+    })
+})
+
 
 app.listen(3000, () => {
     console.log('server started at 3000');
