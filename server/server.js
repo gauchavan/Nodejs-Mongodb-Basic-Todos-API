@@ -53,6 +53,25 @@ app.get('/todo/:id', (req, res) => {
     })
 })
 
+app.delete('/todo/:id', (req, res) => {
+    var id = req.params.id;
+    if(!ObjectId.isValid(id)){
+       return res.status(404).send();
+    }
+
+    Todo.findByIdAndDelete(id).then((todo) =>{
+        if(!todo){
+            res.status(404).send();
+        }
+
+        res.send({
+            todo
+        })
+    }).catch((e) => {
+        res.status(404).send(e);
+    })
+})
+
 app.listen(3000, () => {
     console.log('server started at 3000');
 })
