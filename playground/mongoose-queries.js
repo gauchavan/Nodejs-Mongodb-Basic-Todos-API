@@ -22,5 +22,11 @@ Todo.findOne({
 
 // Find by Id 
 Todo.findById(id).then((todo) => {
+    if(!todo){
+        console.log('Id not found');
+    }
+
     console.log('Todo by Id', todo)
+}).catch((e) => {
+    console.log('Some error', e);
 })
